@@ -1,3 +1,17 @@
+import pandas as pd
+import nltk
+nltk.download('punkt')
+nltk.download('bionlp')
+from nltk.tokenize import BioTokenizer # Use BioTokenizer instead of word_tokenize
+from sklearn.linear_model import LogisticRegression # Use LogisticRegression instead of MultinomialNB
+from sklearn.feature_extraction.text import TfidfVectorizer # Use TfidfVectorizer instead of CountVectorizer
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from tika import parser # Use Tika instead of PyPDF2
+import requests
+from bs4 import BeautifulSoup
+
 # Abrir o arquivo PDF usando Tika
 raw = parser.from_file('C:/Users/uryuu/Downloads/DSM-5-TR.pdf')
 texto_livro = raw['content']
