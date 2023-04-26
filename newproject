@@ -60,12 +60,18 @@ modelo = Pipeline([
 X_train, X_test, y_train, y_test = train_test_split(dados['texto'], dados['classe'], test_size=0.2, random_state=42)
 
 #Treine o modelo com os dados de treinamento usando BERT
+X_train = modelo['vect'].fit_transform(X_train) # Use fit_transform for training data
 modelo.fit(X_train, y_train)
 
 #Faça previsões no conjunto de teste e calcule a acurácia
-y_pred = modelo.predict(X_test)
+X_test = modelo['vect'].transform(X_test) # Use transform for test data
+y_pred = modelo.predict(X_test) # Use pipeline.predict for test data
 accuracy = accuracy_score(y_test, y_pred)
 print("Acurácia do modelo:", accuracy)
+
+#Calcule outras métricas além da acurácia
+from sklearn.metrics import classification_report
+print(classification_report(y_test, y_pred))
 
 #Fazer requisições HTTP aos links adicionais
 links_adicionais = ["http://pepsic.bvsalud.org/scielo.php?script=sci_arttext&pid=S1415-71282006000200011",
