@@ -1,0 +1,79 @@
+# Abrir o arquivo PDF usando Tika
+raw = parser.from_file('C:/Users/uryuu/Downloads/DSM-5-TR.pdf')
+texto_livro = raw['content']
+
+# Tokenize o texto do livro usando BioTokenizer
+tokenizer = BioTokenizer()
+livro_tokens = tokenizer.tokenize(texto_livro)
+
+# Crie um dataframe para os dados do livro usando frases em vez de tokens
+dados = pd.DataFrame({'texto': livro_tokens.sentences(), 'classe': ['livro']*len(livro_tokens.sentences())})
+
+# Você pode usar qualquer fonte de texto que você quiser, mas aqui eu vou usar alguns textos de exemplo do nltk
+from nltk.corpus import gutenberg, brown, reuters
+
+# Adicione mais textos de exemplo de diferentes gêneros e categorias
+url_list = [
+    "http://pepsic.bvsalud.org/scielo.php?script=sci_arttext&pid=S1415-71282006000200011",
+    "https://www.maxwell.vrac.puc-rio.br/15549/15549_6.PDF",
+    "https://www.scielo.br/j/fractal/a/KrXHs3m8gWT7JLFWmX6PkDH/",
+    "https://www.paho.org/pt/topicos/transtornos-mentais",
+    "https://www.scielo.br/j/fractal/a/TVnDqTFkCrLHBHt8Z3BqNvm/"
+]
+
+for url in url_list:
+    # Fazer uma requisição HTTP ao link do artigo
+    response = requests.get(url)
+
+    # Verificar se a requisição foi bem sucedida
+    if response.status_code == 200:
+        # Fazer o parsing do conteúdo HTML
+        soup = BeautifulSoup(response.content, "html.parser")
+        # Extrair o texto do artigo
+        texto = soup.find("div", {"id": "articleText"}).get_text()
+        # Adicionar o texto do artigo ao dataframe dos dados do livro
+        dados = dados.append({"texto": texto, "classe": "nao_livro"}, ignore_index=True)
+    else:
+        # Imprimir uma mensagem de erro
+        print("Erro ao acessar o link:", response.status_code)
+# Crie o modelo de pipeline e treine com os dados usando BERT
+modelo = Pipeline([
+    ('vect',TfidfVectorizer()), # Use TfidfVectorizer instead of CountVectorizer
+    ('clf', LogisticRegression()), # Use LogisticRegression instead of MultinomialNB
+    ])
+
+#Divida os dados em conjuntos de treinamento e teste
+X_train, X_test, y_train, y_test = train_test_split(dados['texto'], dados['classe'], test_size=0.2, random_state=42)
+
+#Treine o modelo com os dados de treinamento usando BERT
+modelo.fit(X_train, y_train)
+
+#Faça previsões no conjunto de teste e calcule a acurácia
+y_pred = modelo.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print("Acurácia do modelo:", accuracy)
+
+#Fazer requisições HTTP aos links adicionais
+links_adicionais = ["http://pepsic.bvsalud.org/scielo.php?script=sci_arttext&pid=S1415-71282006000200011",
+"https://www.maxwell.vrac.puc-rio.br/15549/15549_6.PDF",
+"https://www.scielo.br/j/fractal/a/KrXHs3m8gWT7JLFWmX6PkDH/",
+"https://www.paho.org/pt/topicos/transtornos-mentais",
+"https://www.scielo.br/j/fractal/a/TVnDqTFkCrLHBHt8Z3BqNvm/"]
+
+for link in links_adicionais:
+    response = requests.get(link)
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, "html.parser")
+        texto = soup.find("div", {"id": "articleText"}).get_text()
+        dados = dados.append({"texto": texto, "classe": "livro"}, ignore_index=True)
+
+    else:
+        print("Erro ao acessar o link:", response.status_code)
+
+#Repetir os passos de vetorização, treinamento e teste com os novos dados adicionados
+X_train, X_test, y_train, y_test = train_test_split(dados['texto'], dados['classe'], test_size=0.2, random_state=42)
+modelo.fit(X_train, y_train)
+y_pred = modelo.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print("Acurácia do modelo com dados adicionais:", accuracy)
