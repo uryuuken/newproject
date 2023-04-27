@@ -1,7 +1,9 @@
 import pandas as pd
+import numpy as np
 import nltk
 nltk.download('punkt')
 nltk.download('bionlp')
+from transformers import pipeline, AutoTokenizer, TFAutoModelForSequenceClassification
 from nltk.tokenize import BioTokenizer # Use BioTokenizer instead of word_tokenize
 from sklearn.linear_model import LogisticRegression # Use LogisticRegression instead of MultinomialNB
 from sklearn.feature_extraction.text import TfidfVectorizer # Use TfidfVectorizer instead of CountVectorizer
@@ -11,6 +13,23 @@ from sklearn.metrics import accuracy_score
 from tika import parser # Use Tika instead of PyPDF2
 import requests
 from bs4 import BeautifulSoup
+
+# Carregue o modelo pré-treinado BERT e o tokenizador correspondente
+model_name = 'neuralmind/bert-base-portuguese-cased'
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = TFAutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
+
+# Defina uma função para processar o texto de entrada e fazer previsões com o modelo
+def predict(text):
+    inputs = tokenizer(text, padding=True, truncation=True, return_tensors="tf")
+    outputs = model(inputs)[0]
+    predicted_class = np.argmax(outputs.numpy(), axis=1)[0]
+    return predicted_class
+
+# Exemplo de como usar a função de previsão em um novo texto
+new_text = "Este é um novo texto que será classificado pelo modelo."
+predicted_class = predict(new_text)
+print("A classe prevista para o novo texto é:", predicted_class)
 
 # Abrir o arquivo PDF usando Tika
 raw = parser.from_file('C:/Users/uryuu/Downloads/DSM-5-TR.pdf')
