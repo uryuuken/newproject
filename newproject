@@ -4,7 +4,7 @@ import nltk
 nltk.download('punkt')
 nltk.download('bionlp')
 from transformers import pipeline, AutoTokenizer, TFAutoModelForSequenceClassification
-from nltk.tokenize import BioTokenizer # Use BioTokenizer instead of word_tokenize
+from nltk.tokenize import word_tokenize # Use word_tokenize
 from sklearn.linear_model import LogisticRegression # Use LogisticRegression instead of MultinomialNB
 from sklearn.feature_extraction.text import TfidfVectorizer # Use TfidfVectorizer instead of CountVectorizer
 from sklearn.pipeline import Pipeline
@@ -35,9 +35,9 @@ print("A classe prevista para o novo texto é:", predicted_class)
 raw = parser.from_file('C:/Users/uryuu/Downloads/DSM-5-TR.pdf')
 texto_livro = raw['content']
 
-# Tokenize o texto do livro usando BioTokenizer
-tokenizer = BioTokenizer()
-livro_tokens = tokenizer.tokenize(texto_livro)
+# Tokenize o texto do livro
+tokenizer = word_tokenize 
+livro_tokens = word_tokenize(texto_livro)
 
 # Crie um dataframe para os dados do livro usando frases em vez de tokens
 dados = pd.DataFrame({'texto': livro_tokens.sentences(), 'classe': ['livro']*len(livro_tokens.sentences())})
@@ -78,6 +78,18 @@ modelo = Pipeline([
 #Divida os dados em conjuntos de treinamento e teste
 X_train, X_test, y_train, y_test = train_test_split(dados['texto'], dados['classe'], test_size=0.2, random_state=42)
 
+# Crie um pipeline com TfidfVectorizer e LogisticRegression
+text_clf = Pipeline([
+    ('tfidf', TfidfVectorizer()),
+    ('clf', LogisticRegression()),
+])
+
+# Treine o modelo com os dados rotulados
+text_clf.fit(X_train, y_train)
+
+# Faça previsões em novos documentos
+predicted = text_clf.predict(X_test)
+
 #Treine o modelo com os dados de treinamento usando BERT
 X_train = modelo['vect'].fit_transform(X_train) # Use fit_transform for training data
 modelo.fit(X_train, y_train)
@@ -116,3 +128,37 @@ modelo.fit(X_train, y_train)
 y_pred = modelo.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 print("Acurácia do modelo com dados adicionais:", accuracy)
+
+# Solicitar ao usuário para inserir um texto
+new_text = input("Insira um texto: ")
+
+# Usar a função de previsão para fazer uma previsão de classe para o novo texto
+predicted_class = predict(new_text)
+
+# Gerar uma sugestão com base na classe prevista
+if predicted_class == 0:
+    suggestion = "Sugestão para a classe 0"
+elif predicted_class == 1:
+    suggestion = "Sugestão para a classe 1"
+else:
+    suggestion = "Sugestão para a classe 2"
+
+# Defina o limite máximo de caracteres para as sugestões
+max_chars = 2000
+
+# Gerar uma sugestão com base na classe prevista
+if predicted_class == 0:
+    suggestion = "Sugestão para a classe 0"
+elif predicted_class == 1:
+    suggestion = "Sugestão para a classe 1"
+else:
+    suggestion = "Sugestão para a classe 2"
+
+# Truncar a sugestão se ela exceder o limite máximo de caracteres
+if len(suggestion) > max_chars:
+    suggestion = suggestion[:max_chars] + "..."
+
+# Imprimir a sugestão gerada
+print("Sugestão:", suggestion)
+
+
