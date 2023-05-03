@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import nltk
 nltk.download('punkt')
-nltk.download('bionlp')
 from transformers import pipeline, AutoTokenizer, TFAutoModelForSequenceClassification
 from nltk.tokenize import word_tokenize # Use word_tokenize
 from sklearn.linear_model import LogisticRegression # Use LogisticRegression instead of MultinomialNB
@@ -36,7 +35,7 @@ raw = parser.from_file('C:/Users/uryuu/Downloads/DSM-5-TR.pdf')
 texto_livro = raw['content']
 
 # Tokenize o texto do livro
-tokenizer = word_tokenize 
+tokenizer = word_tokenize
 livro_tokens = word_tokenize(texto_livro)
 
 # Crie um dataframe para os dados do livro usando frases em vez de tokens
@@ -160,5 +159,3 @@ if len(suggestion) > max_chars:
 
 # Imprimir a sugestão gerada
 print("Sugestão:", suggestion)
-
-
