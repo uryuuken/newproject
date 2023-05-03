@@ -18,13 +18,6 @@ from bs4 import BeautifulSoup
 # Carregar o modelo treinado a partir do arquivo
 model = joblib.load('modelo.joblib')
 
-def search_scielo(query):
-    # Fazer uma busca na API do Scielo com base na consulta fornecida
-    results = pycelo.search(query)
-    
-# Retornar as sugestões geradas
-return suggestions
-
 # Carregue o modelo pré-treinado BERT e o tokenizador correspondente
 model_name = 'neuralmind/bert-base-portuguese-cased'
 tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -146,8 +139,16 @@ new_text = input("Descreva o caso: ")
 # Executar a busca no Scielo e gerar sugestões com base nos resultados da busca
 search_suggestions = search_scielo(new_text)
 
+def predict(text):
+    # Realizar busca na Scielo
+    search_results = search_scielo(text)
+    
+def search_scielo(search_query):
+    scielo = PyCelo()
+    scielo.search(search_query)
+
 # Usar a função de previsão para fazer uma previsão de classe para o novo texto
-predicted_class = predict(new_text)
+predicted_class = predict(search_query)
 
 # Gerar uma sugestão com base na classe prevista
 if predicted_class == 0:
