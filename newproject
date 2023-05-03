@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import requests
 import joblib
+import pycelo
 import nltk
 nltk.download('punkt')
 from transformers import pipeline, AutoTokenizer, TFAutoModelForSequenceClassification
@@ -16,6 +17,13 @@ from bs4 import BeautifulSoup
 
 # Carregar o modelo treinado a partir do arquivo
 model = joblib.load('modelo.joblib')
+
+def search_scielo(query):
+    # Fazer uma busca na API do Scielo com base na consulta fornecida
+    results = pycelo.search(query)
+    
+# Retornar as sugestões geradas
+return suggestions
 
 # Carregue o modelo pré-treinado BERT e o tokenizador correspondente
 model_name = 'neuralmind/bert-base-portuguese-cased'
@@ -135,6 +143,9 @@ print("Acurácia do modelo com dados adicionais:", accuracy)
 # Solicitar ao usuário para inserir um texto
 new_text = input("Descreva o caso: ")
 
+# Executar a busca no Scielo e gerar sugestões com base nos resultados da busca
+search_suggestions = search_scielo(new_text)
+
 # Usar a função de previsão para fazer uma previsão de classe para o novo texto
 predicted_class = predict(new_text)
 
@@ -145,6 +156,9 @@ elif predicted_class == 1:
     suggestion = "Sugestão para a classe 1"
 else:
     suggestion = "Sugestão para a classe 2"
+
+# Combinar a sugestão gerada pela função predict com as sugestões geradas pela função search_scielo
+combined_suggestions = suggestion + "\n" + "\n".join(search_suggestions)
 
 # Defina o limite máximo de caracteres para as sugestões
 max_chars = 1000
