@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import requests
+import joblib
 import nltk
 nltk.download('punkt')
 from transformers import pipeline, AutoTokenizer, TFAutoModelForSequenceClassification
@@ -10,8 +12,10 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from tika import parser # Use Tika instead of PyPDF2
-import requests
 from bs4 import BeautifulSoup
+
+# Carregar o modelo treinado a partir do arquivo
+model = joblib.load('modelo.joblib')
 
 # Carregue o modelo pré-treinado BERT e o tokenizador correspondente
 model_name = 'neuralmind/bert-base-portuguese-cased'
@@ -129,7 +133,7 @@ accuracy = accuracy_score(y_test, y_pred)
 print("Acurácia do modelo com dados adicionais:", accuracy)
 
 # Solicitar ao usuário para inserir um texto
-new_text = input("Insira um texto: ")
+new_text = input("Descreva o caso: ")
 
 # Usar a função de previsão para fazer uma previsão de classe para o novo texto
 predicted_class = predict(new_text)
@@ -143,7 +147,7 @@ else:
     suggestion = "Sugestão para a classe 2"
 
 # Defina o limite máximo de caracteres para as sugestões
-max_chars = 2000
+max_chars = 1000
 
 # Gerar uma sugestão com base na classe prevista
 if predicted_class == 0:
