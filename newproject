@@ -136,11 +136,11 @@ print("Acurácia do modelo com dados adicionais:", accuracy)
 # Solicitar ao usuário para inserir um texto
 new_text = input("Descreva o caso: ")
 
-# Executar a busca no Scielo e gerar sugestões com base nos resultados da busca
-search_suggestions = search_scielo(new_text)
-
-# Usar a função de previsão para fazer uma previsão de classe para o novo texto
+# Utilizar a função predict para fazer a previsão de classe para o novo texto
 predicted_class = predict(new_text)
+
+# Executar a busca no Scielo e gerar sugestões com base nos resultados da busca
+search_suggestions = search_scielo(predicted_class)
 
 # Gerar uma sugestão com base na classe prevista
 if predicted_class == 0:
