@@ -139,16 +139,8 @@ new_text = input("Descreva o caso: ")
 # Executar a busca no Scielo e gerar sugestões com base nos resultados da busca
 search_suggestions = search_scielo(new_text)
 
-def predict(text):
-    # Realizar busca na Scielo
-    search_results = search_scielo(text)
-    
-def search_scielo(search_query):
-    scielo = PyCelo()
-    scielo.search(search_query)
-
 # Usar a função de previsão para fazer uma previsão de classe para o novo texto
-predicted_class = predict(search_query)
+predicted_class = predict(new_text)
 
 # Gerar uma sugestão com base na classe prevista
 if predicted_class == 0:
@@ -164,17 +156,10 @@ combined_suggestions = suggestion + "\n" + "\n".join(search_suggestions)
 # Defina o limite máximo de caracteres para as sugestões
 max_chars = 1000
 
-# Gerar uma sugestão com base na classe prevista
-if predicted_class == 0:
-    suggestion = "Sugestão para a classe 0"
-elif predicted_class == 1:
-    suggestion = "Sugestão para a classe 1"
-else:
-    suggestion = "Sugestão para a classe 2"
-
 # Truncar a sugestão se ela exceder o limite máximo de caracteres
-if len(suggestion) > max_chars:
-    suggestion = suggestion[:max_chars] + "..."
+if len(combined_suggestions) > max_chars:
+    combined_suggestions = combined_suggestions[:max_chars] + "..."
 
 # Imprimir a sugestão gerada
-print("Sugestão:", suggestion)
+print("Sugestão:", combined_suggestions)
+
