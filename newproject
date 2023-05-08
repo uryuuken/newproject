@@ -6,7 +6,7 @@ import pycelo
 import nltk
 nltk.download('punkt')
 from transformers import pipeline, AutoTokenizer, TFAutoModelForSequenceClassification
-from nltk.tokenize import word_tokenize # Use word_tokenize
+from nltk.tokenize import word_tokenize, sent_tokenize # Use word_tokenize
 from sklearn.linear_model import LogisticRegression # Use LogisticRegression instead of MultinomialNB
 from sklearn.feature_extraction.text import TfidfVectorizer # Use TfidfVectorizer instead of CountVectorizer
 from sklearn.pipeline import Pipeline
@@ -39,12 +39,14 @@ print("A classe prevista para o novo texto é:", predicted_class)
 raw = parser.from_file('C:/Users/uryuu/Downloads/DSM-5-TR.pdf')
 texto_livro = raw['content']
 
-# Tokenize o texto do livro
-tokenizer = word_tokenize
-livro_tokens = word_tokenize(texto_livro)
+# Tokenize o texto do livro em frases
+frases_livro = sent_tokenize(texto_livro)
+
+# Tokenize cada frase em palavras
+livro_tokens = [word_tokenize(frase) for frase in frases_livro]
 
 # Crie um dataframe para os dados do livro usando frases em vez de tokens
-dados = pd.DataFrame({'texto': livro_tokens.sentences(), 'classe': ['livro']*len(livro_tokens.sentences())})
+dados = pd.DataFrame({'texto': frases_livro, 'classe': ['livro']*len(frases_livro)})
 
 # Você pode usar qualquer fonte de texto que você quiser, mas aqui eu vou usar alguns textos de exemplo do nltk
 from nltk.corpus import gutenberg, brown, reuters
